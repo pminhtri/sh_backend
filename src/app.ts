@@ -12,14 +12,12 @@ import { DBContext } from './infra';
 
 export class App {
   private readonly app: FastifyInstance;
-  private readonly configService: IConfigService;
 
-  constructor(configService: IConfigService) {
+  constructor() {
     this.app = Fastify({
       trustProxy: true,
       ajv: { customOptions: { allErrors: true, removeAdditional: true }, plugins: [ajvErrors] }
     });
-    this.configService = configService;
     this.initMiddlewares();
     this.setupRoutes();
   }
@@ -76,13 +74,14 @@ export class App {
   }
 
   public async run() {
-    await this.connectDB();
+    const configService = appContainer.get<IConfigService>('IConfigService');
 
+    await this.connectDB();
     await this.app.listen({
-      host: this.configService.get<string>('HOST'),
-      port: this.configService.get<number>('PORT')
+      host: configService.get<string>('HOST'),
+      port: configService.get<number>('PORT')
     });
 
-    console.info(`Server is running on port ${this.configService.get<number>('PORT') || 3000}`);
+    console.info(`Server is running on port ${configService.get<number>('PORT') || 3000}`);
   }
 }

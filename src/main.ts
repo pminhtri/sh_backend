@@ -22,7 +22,7 @@ async function start() {
   const configService = appContainer.get<IConfigService>('IConfigService');
   configService.load();
 
-  const app = new App(configService);
+  const app = new App();
   await app.run();
 }
 
